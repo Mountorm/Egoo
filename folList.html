@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的粉丝</title>
+    <title>我的关注</title>
     <style>
         * {
             margin: 0;
@@ -274,7 +274,7 @@
     <!-- 导航栏 -->
     <div class="nav-bar">
         <div class="back-button">&#10094;</div>
-        <div class="title">我的粉丝</div>
+        <div class="title">我的关注</div>
         <div class="menu-dots">  </div>
     </div>
     
@@ -289,7 +289,7 @@
             <div class="username">Egoo</div>
             <div class="bio">有个性，没签名</div>
         </div>
-        <button class="follow-button">回关</button>
+        <button class="follow-button" style="background-color: #f0f0f0;">已关注</button>
       
     </div>
     
@@ -339,10 +339,10 @@
         }
         
         document.querySelector('.follow-button').addEventListener('click', function() {
-            if (this.textContent === '已互关') {  // 修改判断条件
+            if (this.textContent === '已关注') {
                 showActionSheet();
             } else {
-                this.textContent = '已互关';
+                this.textContent = '已关注';
                 this.style.backgroundColor = '#f0f0f0';
             }
         });
@@ -350,7 +350,7 @@
         document.querySelector('.unfollow-btn').addEventListener('click', function() {
             hideActionSheet();
             const followButton = document.querySelector('.follow-button');
-            followButton.textContent = '回关';
+            followButton.textContent = '关注';
             followButton.style.backgroundColor = '#c8ff00';
         });
         
