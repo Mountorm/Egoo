@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>兴趣和职业表单</title>
+  <style>
+    /* Reset and base styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    
+    body {
+      background-color: #f9fafb;
+      color: #111827;
+      line-height: 1.5;
+    }
+    
+    /* Layout */
+    .container {
+      max-width: 28rem;
+      margin: 0 auto;
+      background-color: white;
+      min-height: 100vh;
+    }
+    
+    .header {
+      padding: 1rem;
+      border-bottom: 1px solid #f3f4f6;
+      position: sticky;
+      top: 0;
+      background-color: white;
+      z-index: 10;
+    }
+    
+    .title {
+      font-size: 1.125rem;
+      font-weight: 500;
+      text-align: center;
+    }
+    
+    .progress-container {
+      height: 0.375rem;
+      background-color: #e5e7eb;
+      border-radius: 9999px;
+      margin-top: 0.75rem;
+      overflow: hidden;
+    }
+    
+    .progress-bar {
+      height: 100%;
+      background-color: #ccf950;
+      border-radius: 9999px;
+      transition: width 0.3s ease;
+    }
+    
+    .form-container {
+      padding: 1rem;
+    }
+    
+    /* Form elements */
+    .form-box  {
+      background-color: white;
+      border-radius: 0.5rem;
+      padding: 5px 15px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      cursor: pointer;
+    }
+
+    .form-item {
+      
+      padding-top: 10px ;
+
+      height: 45px;
+
+    }
+    
+    .form-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .form-item-title {
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-right: 0.5rem;
+      white-space: nowrap;
+    }
+    
+    .form-item-content-wrapper {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      min-width: 0;
+      justify-content: flex-end;
+      text-align: right;
+    }
+    
+    .form-item-placeholder {
+        
+      font-size: 0.875rem;
+      color: #9ca3af;
+    }
+    
+    .form-item-content {
+        
+      font-size: 0.875rem;
+      margin: 0;
+      max-width: 12rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .chevron-right {
+      width: 1.25rem;
+      height: 1.25rem;
+      color: #9ca3af;
+    }
+    
+    .error-message {
+      font-size: 0.75rem;
+      color: #ef4444;
+      margin-top: 0.25rem;
+    }
+    
+    /* Badges */
+    .badge-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+      margin-top: 0.5rem;
+    }
+    
+    .badge {
+      background-color: #ccf950;
+      color: black;
+      font-size: 0.75rem;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+    }
+    
+    .badge-gray {
+      background-color: #f3f4f6;
+      color: #4b5563;
+    }
+    
+    .badge-selected {
+      background-color: #ccf950;
+      color: black;
+    }
+    
+    .badge-remove {
+      margin-left: 0.25rem;
+      width: 0.75rem;
+      height: 0.75rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 9999px;
+    }
+    
+    .badge-remove:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Button */
+    .button {
+      width: 100%;
+      background-color: #ccf950;
+      color: black;
+      height: 3rem;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      /* margin-top: 1rem; */
+    }
+    
+    .button:hover {
+      background-color: #b9e639;
+    }
+    
+    .button-small {
+      height: 2.25rem;
+      min-width: 4rem;
+      padding: 0 1rem;
+      font-size: 0.875rem;
+      /* background: #f3f4f6; */
+      color: #374151;
+      transition: all 0.2s;
+    }
+    
+    .button-small:hover {
+      background: #e5e7eb;
+    }
+    
+    /* Bottom sheet */
+    .bottom-sheet-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      background-color: rgba(0, 0, 0, 0.5);
+      transition: opacity 0.3s;
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    .bottom-sheet-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    
+    .bottom-sheet {
+      width: 100%;
+      max-width: 28rem;
+      background-color: white;
+      border-top-left-radius: 0.75rem;
+      border-top-right-radius: 0.75rem;
+      transform: translateY(100%);
+      transition: transform 0.3s ease-in-out;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+    
+    .bottom-sheet.open {
+      transform: translateY(0);
+    }
+    
+    .bottom-sheet-header {
+      position: sticky;
+      top: 0;
+      background-color: white;
+      z-index: 10;
+      border-bottom: 1px solid #f3f4f6;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .bottom-sheet-title {
+      font-size: 1.125rem;
+      font-weight: 500;
+      flex: 1;
+      text-align: center;
+      margin: 0 1rem;
+    }
+    
+    .close-button {
+      border-radius: 9999px;
+      padding: 0.25rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .close-button:hover {
+      background-color: #f3f4f6;
+    }
+    
+    .bottom-sheet-content {
+      padding: 1rem;
+    }
+    
+    .section {
+      margin-bottom: 1rem;
+    }
+    
+    .section-title {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin-bottom: 0.5rem;
+    }
+    
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+    }
+    
+    .input-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      padding: 0.5rem;
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+    
+    .input {
+      flex: 1;
+      height: 2.25rem;
+      padding: 0 0.75rem;
+      border-radius: 0.375rem;
+      border: none;
+      background: #f9fafb;
+      font-size: 0.875rem;
+    }
+    
+    .input:focus {
+      outline: none;
+      background: white;
+      box-shadow: inset 0 0 0 2px #ccf950;
+    }
+    
+    .placeholder-text {
+      font-size: 0.875rem;
+      color: #9ca3af;
+    }
+    
+    /* Success page */
+    .success-container {
+      padding: 1rem;
+      text-align: center;
+    }
+    
+    .success-icon-container {
+      display: flex;
+      justify-content: center;
+      padding: 1.5rem 0;
+    }
+    
+    .success-icon-bg {
+      background-color: rgba(204, 249, 80, 0.2);
+      border-radius: 9999px;
+      padding: 1rem;
+    }
+    
+    .success-icon {
+      width: 4rem;
+      height: 4rem;
+      color: #ccf950;
+    }
+    
+    .success-title {
+      font-size: 1.25rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    
+    .success-subtitle {
+      color: #6b7280;
+      margin-bottom: 1.5rem;
+    }
+    
+    .success-info {
+      background-color: #f9fafb;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      text-align: left;
+      margin-bottom: 1.5rem;
+    }
+    
+    .info-section {
+      margin-bottom: 1rem;
+    }
+    
+    .info-section:last-child {
+      margin-bottom: 0;
+    }
+    
+    .info-title {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #6b7280;
+      margin-bottom: 0.5rem;
+    }
+    
+    .hidden {
+      display: none;
+    }
+
+    .text-button {
+      border: none;
+      background: none;
+      color: #1f2937;
+      font-size: 0.875rem;
+      padding: 0.5rem;
+      cursor: pointer;
+      border-radius: 0.375rem;
+    }
+    
+    .text-button:hover {
+      background-color: #f3f4f6;
+    }
+
+    /* 需求说明便签 */
+    .sticky-note {
+      position: fixed;
+      width: 400px;
+      
+      background: #fff9c4;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      max-height: 600px;
+      overflow-y: auto;
+      z-index: 40;
+      top: 20px;
+    }
+    
+    /* 左侧兴趣便签 */
+    .sticky-note-interests {
+      left: 20px;
+    }
+    
+    /* 右侧职业便签 */
+    .sticky-note-occupation {
+      right: 20px;
+    }
+
+    /* 最大数量提示 */
+    .max-count-tip {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 0.5rem;
+      text-align: right;
+    }
+
+    .max-count-tip.error {
+      color: #ef4444;
+    }
+  </style>
+</head>
+<body>
+  <!-- 需求说明便签 -->
+  <div class="sticky-note sticky-note-interests">
+    <div class="sticky-note-title">兴趣</div>
+    <div class="sticky-note-content">
+      1. 基础功能<br>
+      - 用户可以自行输入自定义兴趣标签,不限于预设标签<br>
+      - 可以同时选择预设标签和自定义标签<br>
+      - 自定义标签点击后可取消选择<br><br>
+      2. 交互需求<br>
+      - 自定义输入为空时不可添加<br>
+      - 不允许添加重复的标签<br>
+      - 最多选中5个兴趣标签（包含自定义和预设的）
+    </div>
+  </div>
+
+  <div class="sticky-note sticky-note-occupation">
+    <div class="sticky-note-title">职业</div>
+    <div class="sticky-note-content">
+      1. 基础功能<br>
+      - 用户可以输入自定义职业名称<br>
+      - 预设职业和自定义职业只能二选一<br><br>
+      2. 交互需求<br>
+      - 选择预设职业时,清空自定义输入<br>
+      - 开始自定义输入时,取消预设职业的选择<br>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <h1 class="title" id="page-title">编辑设置</h1>
+    </div>
+
+    <div id="form-page">
+      <div class="form-container">
+        <!-- Interests Field -->
+         <div class="form-box">
+        
+        <div class="form-item" id="interests-field">
+          <div class="form-item-header">
+            <div class="form-item-title">兴趣</div>
+            <div class="form-item-content-wrapper">
+              <div id="interests-placeholder" class="form-item-placeholder">请选择</div>
+              <div id="interests-content" class="form-item-content hidden"></div>
+            </div>
+            <svg class="chevron-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+          <div id="interests-error" class="error-message hidden"></div>
+        </div>
+
+        <!-- Occupation Field -->
+        <div class="form-item" id="occupation-field">
+          <div class="form-item-header">
+            <div class="form-item-title">职业</div>
+            <div class="form-item-content-wrapper">
+              <div id="occupation-placeholder" class="form-item-placeholder">请选择</div>
+              <div id="occupation-content" class="form-item-content hidden"></div>
+            </div>
+            <svg class="chevron-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+          <div id="occupation-error" class="error-message hidden"></div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+  
+  <!-- Interests Bottom Sheet -->
+  <div class="bottom-sheet-overlay" id="interests-sheet-overlay">
+    <div class="bottom-sheet" id="interests-sheet">
+      <div class="bottom-sheet-header">
+        <button class="text-button" id="interests-sheet-close">取消</button>
+        <h3 class="bottom-sheet-title">选择兴趣</h3>
+        <button class="text-button" id="confirm-interests-button">确认</button>
+      </div>
+      
+      <div class="bottom-sheet-content">
+        <div class="section">
+          <div class="section-title">常用兴趣标签</div>
+          <div id="common-interests" class="badge-container"></div>
+          <div id="interests-max-tip" class="max-count-tip">已选择 0/5 个</div>
+        </div>
+        
+        <div class="section">
+          <div class="section-title">添加自定义兴趣</div>
+          <div class="input-container">
+            <input type="text" class="input" id="custom-interest-input" placeholder="输入你感兴趣的内容">
+            <button class="button button-small" id="add-interest-button">添加</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Occupation Bottom Sheet -->
+  <div class="bottom-sheet-overlay" id="occupation-sheet-overlay">
+    <div class="bottom-sheet" id="occupation-sheet">
+      <div class="bottom-sheet-header">
+        <button class="text-button" id="occupation-sheet-close">取消</button>
+        <h3 class="bottom-sheet-title">选择职业</h3>
+        <button class="text-button" id="confirm-occupation-button">确认</button>
+      </div>
+      
+      <div class="bottom-sheet-content">
+        <div class="section">
+          <div class="section-title">常用职业</div>
+          <div id="common-occupations" class="grid-container"></div>
+        </div>
+        
+        <div class="section">
+          <div class="section-title">输入职业</div>
+          <div class="input-container">
+            <input type="text" class="input" id="custom-occupation-input" placeholder="输入你的职业">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Data
+    const commonInterests = [
+      "阅读", "旅行", "音乐", "电影", "摄影", 
+      "烹饪", "健身", "游戏", "绘画", "舞蹈", 
+      "编程", "写作", "园艺", "瑜伽", "徒步"
+    ];
+    
+    const commonOccupations = [
+      "工程师", "教师", "医生", "设计师", "学生", 
+      "销售", "管理", "艺术家", "程序员", "律师", 
+      "会计", "自由职业", "营销", "研究员", "企业家"
+    ];
+    
+    // State
+    let state = {
+      interests: [],
+      occupation: "",
+      customOccupation: "",
+      errors: {
+        interests: "",
+        occupation: ""
+      }
+    };
+
+    // 临时状态
+    let tempState = {
+      interests: [],
+      occupation: "",
+      customOccupation: ""
+    };
+    
+    // DOM Elements
+    const formPage = document.getElementById('form-page');
+    const pageTitle = document.getElementById('page-title');
+    
+    const interestsField = document.getElementById('interests-field');
+    const interestsPlaceholder = document.getElementById('interests-placeholder');
+    const interestsContent = document.getElementById('interests-content');
+    const interestsError = document.getElementById('interests-error');
+    
+    const occupationField = document.getElementById('occupation-field');
+    const occupationPlaceholder = document.getElementById('occupation-placeholder');
+    const occupationContent = document.getElementById('occupation-content');
+    const occupationError = document.getElementById('occupation-error');
+    
+    const interestsSheetOverlay = document.getElementById('interests-sheet-overlay');
+    const interestsSheet = document.getElementById('interests-sheet');
+    const interestsSheetClose = document.getElementById('interests-sheet-close');
+    const commonInterestsContainer = document.getElementById('common-interests');
+    const customInterestInput = document.getElementById('custom-interest-input');
+    const addInterestButton = document.getElementById('add-interest-button');
+    const confirmInterestsButton = document.getElementById('confirm-interests-button');
+    
+    const occupationSheetOverlay = document.getElementById('occupation-sheet-overlay');
+    const occupationSheet = document.getElementById('occupation-sheet');
+    const occupationSheetClose = document.getElementById('occupation-sheet-close');
+    const commonOccupationsContainer = document.getElementById('common-occupations');
+    const customOccupationInput = document.getElementById('custom-occupation-input');
+    const confirmOccupationButton = document.getElementById('confirm-occupation-button');
+    
+    // Initialize
+    function init() {
+      // Populate common interests
+      commonInterests.forEach(interest => {
+        const badge = createBadge(interest, 'badge-gray');
+        badge.addEventListener('click', () => toggleTempInterest(interest));
+        commonInterestsContainer.appendChild(badge);
+      });
+
+      // 添加临时状态数据到标签区域
+      function updateCustomInterests() {
+        // 清除已有的自定义标签
+        Array.from(commonInterestsContainer.children).forEach(child => {
+          if (!commonInterests.includes(child.textContent.trim())) {
+            child.remove();
+          }
+        });
+        
+        // 添加新的自定义标签
+        tempState.interests.forEach(interest => {
+          if (!commonInterests.includes(interest)) {
+            const badge = createBadge(interest, 'badge-selected');
+            badge.addEventListener('click', () => toggleTempInterest(interest));
+            commonInterestsContainer.appendChild(badge);
+          }
+        });
+        updateMaxTip(); 
+      }
+
+      function addCustomInterest() {
+        const interest = customInterestInput.value.trim();
+        if (!interest) return;
+        
+        if (tempState.interests.length >= 5) {
+          document.getElementById('interests-max-tip').classList.add('error');
+          return;
+        }
+        
+        if (!tempState.interests.includes(interest)) {
+          tempState.interests.push(interest);
+          customInterestInput.value = '';
+          updateCustomInterests();
+          renderTempInterests();
+          updateMaxTip(); // 添加这行
+        }
+      }
+
+      function openInterestsSheet() {
+        tempState.interests = [...state.interests];
+        interestsSheetOverlay.classList.add('open');
+        interestsSheet.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        updateCustomInterests();
+        renderTempInterests();
+        updateMaxTip(); // 添加这行
+      }
+
+      // Populate common occupations
+      commonOccupations.forEach(job => {
+        const badge = createBadge(job, 'badge-gray');
+        badge.style.justifyContent = 'center';
+        badge.style.padding = '0.5rem';
+        badge.addEventListener('click', () => selectTempOccupation(job));
+        commonOccupationsContainer.appendChild(badge);
+      });
+
+      // Event listeners
+      interestsField.addEventListener('click', openInterestsSheet);
+      interestsSheetClose.addEventListener('click', closeInterestsSheet);
+      interestsSheetOverlay.addEventListener('click', (e) => {
+        if (e.target === interestsSheetOverlay) {
+          closeInterestsSheet();
+        }
+      });
+      
+      occupationField.addEventListener('click', openOccupationSheet);
+      occupationSheetClose.addEventListener('click', closeOccupationSheet);
+      occupationSheetOverlay.addEventListener('click', (e) => {
+        if (e.target === occupationSheetOverlay) {
+          closeOccupationSheet();
+        }
+      });
+      
+      addInterestButton.addEventListener('click', addCustomInterest);
+      customInterestInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          addCustomInterest();
+        }
+      });
+      
+      confirmInterestsButton.addEventListener('click', () => {
+        state.interests = [...tempState.interests];
+        closeInterestsSheet();
+        renderInterests();
+      });
+      
+      customOccupationInput.addEventListener('input', (e) => {
+        tempState.customOccupation = e.target.value.trim();
+        tempState.occupation = ''; // 清空常用职业的选择
+        renderTempOccupation();
+      });
+      
+      confirmOccupationButton.addEventListener('click', () => {
+        const customJob = customOccupationInput.value.trim();
+        if (customJob) {
+          state.occupation = '';
+          state.customOccupation = customJob;
+        } else {
+          state.occupation = tempState.occupation;
+          state.customOccupation = '';
+        }
+        closeOccupationSheet();
+        renderOccupation();
+      });
+      
+      // Initial render
+      renderInterests();
+      renderOccupation();
+    }
+
+    // Render functions
+    function renderInterests() {
+      if (state.interests.length > 0) {
+        interestsPlaceholder.classList.add('hidden');
+        interestsContent.classList.remove('hidden');
+        interestsContent.textContent = state.interests.length > 1 
+          ? `${state.interests[0]}等${state.interests.length}个` 
+          : state.interests[0];
+      } else {
+        interestsPlaceholder.classList.remove('hidden');
+        interestsContent.classList.add('hidden');
+      }
+      // Update common interests in bottom sheet
+      Array.from(commonInterestsContainer.children).forEach(badge => {
+        const interestText = badge.textContent.trim();
+        if (state.interests.includes(interestText)) {
+          badge.classList.remove('badge-gray');
+          badge.classList.add('badge-selected');
+        } else {
+          badge.classList.add('badge-gray');
+          badge.classList.remove('badge-selected');
+        }
+      });
+      
+      if (state.errors.interests) {
+        interestsError.textContent = state.errors.interests;
+        interestsError.classList.remove('hidden');
+      } else {
+        interestsError.classList.add('hidden');
+      }
+    }
+    
+    function renderOccupation() {
+      const finalOccupation = state.customOccupation || state.occupation;
+      
+      // Update form field
+      if (finalOccupation) {
+        occupationPlaceholder.classList.add('hidden');
+        occupationContent.classList.remove('hidden');
+        occupationContent.textContent = finalOccupation;
+      } else {
+        occupationPlaceholder.classList.remove('hidden');
+        occupationContent.classList.add('hidden');
+      }
+      
+      // Update common occupations in bottom sheet
+      Array.from(commonOccupationsContainer.children).forEach(badge => {
+        const jobText = badge.textContent.trim();
+        if (state.occupation === jobText) {
+          badge.classList.remove('badge-gray');
+          badge.classList.add('badge-selected');
+        } else {
+          badge.classList.add('badge-gray');
+          badge.classList.remove('badge-selected');
+        }
+      });
+      
+      // Update custom occupation input
+      customOccupationInput.value = state.customOccupation;
+      
+      // Show/hide error
+      if (state.errors.occupation) {
+        occupationError.textContent = state.errors.occupation;
+        occupationError.classList.remove('hidden');
+      } else {
+        occupationError.classList.add('hidden');
+      }
+    }
+    
+    // Helper functions
+    function createBadge(text, additionalClass = '', removable = false) {
+      const badge = document.createElement('div');
+      badge.className = `badge ${additionalClass}`;
+      badge.textContent = text;
+      
+      if (removable) {
+        const removeButton = document.createElement('span');
+        removeButton.className = 'badge-remove';
+        removeButton.innerHTML = `
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        `;
+        removeButton.addEventListener('click', (e) => {
+          e.stopPropagation();
+          removeInterest(text);
+        });
+        badge.appendChild(removeButton);
+      }
+      
+      return badge;
+    }
+    
+    // Action functions
+    function toggleInterest(interest) {
+      if (state.interests.includes(interest)) {
+        state.interests = state.interests.filter(i => i !== interest);
+      } else {
+        state.interests.push(interest);
+        state.errors.interests = '';
+      }
+      renderInterests();
+    }
+    
+    function toggleTempInterest(interest) {
+      if (tempState.interests.includes(interest)) {
+        tempState.interests = tempState.interests.filter(i => i !== interest);
+        updateMaxTip();
+      } else {
+        if (tempState.interests.length >= 5) {
+          document.getElementById('interests-max-tip').classList.add('error');
+          return;
+        }
+        tempState.interests.push(interest);
+        document.getElementById('interests-max-tip').classList.remove('error');
+      }
+      renderTempInterests();
+      updateMaxTip();
+    }
+    
+    function addCustomInterest() {
+      const interest = customInterestInput.value.trim();
+      if (!interest) return;
+      
+      if (tempState.interests.length >= 5) {
+        document.getElementById('interests-max-tip').classList.add('error');
+        return;
+      }
+      
+      if (!tempState.interests.includes(interest)) {
+        tempState.interests.push(interest);
+        customInterestInput.value = '';
+        updateCustomInterests();
+        renderTempInterests();
+        updateMaxTip(); // 添加这行
+      }
+    }
+    
+    function removeInterest(interest) {
+      state.interests = state.interests.filter(i => i !== interest);
+      renderInterests();
+    }
+    
+    function selectOccupation(job) {
+      state.occupation = job;
+      state.customOccupation = '';
+      state.errors.occupation = '';
+      renderOccupation();
+    }
+    
+    function selectTempOccupation(job) {
+      tempState.occupation = job;
+      tempState.customOccupation = '';  // 清空自定义职业
+      customOccupationInput.value = ''; // 清空输入框
+      renderTempOccupation();
+    }
+    
+    function confirmOccupation() {
+      const customJob = customOccupationInput.value.trim();
+      if (customJob) {
+        state.customOccupation = customJob;
+        state.occupation = '';
+        state.errors.occupation = '';
+      }
+      closeOccupationSheet();
+      renderOccupation();
+    }
+    
+    // Render temporary state
+    function renderTempInterests() {
+      Array.from(commonInterestsContainer.children).forEach(badge => {
+        const interestText = badge.textContent.trim();
+        if (tempState.interests.includes(interestText)) {
+          badge.classList.remove('badge-gray');
+          badge.classList.add('badge-selected');
+        } else {
+          badge.classList.add('badge-gray');
+          badge.classList.remove('badge-selected');
+        }
+      });
+    }
+
+    function renderTempOccupation() {
+      Array.from(commonOccupationsContainer.children).forEach(badge => {
+        const jobText = badge.textContent.trim();
+        if (tempState.occupation === jobText) {
+          badge.classList.remove('badge-gray');
+          badge.classList.add('badge-selected');
+        } else {
+          badge.classList.add('badge-gray');
+          badge.classList.remove('badge-selected');
+        }
+      });
+    }
+    
+    // Bottom sheet functions
+    function openInterestsSheet() {
+      tempState.interests = [...state.interests];
+      interestsSheetOverlay.classList.add('open');
+      interestsSheet.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      updateCustomInterests();
+      renderTempInterests();
+      updateMaxTip(); // 添加这行
+    }
+    
+    function closeInterestsSheet() {
+      interestsSheetOverlay.classList.remove('open');
+      interestsSheet.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    
+    function openOccupationSheet() {
+      tempState.occupation = state.occupation;
+      tempState.customOccupation = state.customOccupation;
+      occupationSheetOverlay.classList.add('open');
+      occupationSheet.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      customOccupationInput.value = tempState.customOccupation;
+      renderTempOccupation();
+    }
+    
+    function closeOccupationSheet() {
+      occupationSheetOverlay.classList.remove('open');
+      occupationSheet.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // 新增更新最大数量提示的函数
+    function updateMaxTip() {
+      const maxTip = document.getElementById('interests-max-tip');
+      maxTip.textContent = `已选择 ${tempState.interests.length}/5 个`;
+      maxTip.classList.toggle('error', tempState.interests.length >= 5);
+    }
+    
+    // Initialize the app
+    init();
+  </script>
+</body>
+</html>
